@@ -1,0 +1,12 @@
+[package]
+name = "rocket-pastebin"
+version = "0.1.0"
+authors = ["Bart Massey <bart@cs.pdx.edu>"]
+
+[[bin]]
+name = "pastebin"
+
+[dependencies]
+rocket = "0.1.1"
+rocket_codegen = "0.1.1"
+rand = "0.3"
