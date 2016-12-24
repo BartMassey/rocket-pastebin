@@ -6,19 +6,24 @@
 #![plugin(rocket_codegen)]
 
 extern crate rocket;
+extern crate rocket_contrib;
 extern crate rand;
 
 use std::io;
 use std::path::Path;
+use std::collections::HashMap;
+
 use rocket::Data;
 use rocket::response::NamedFile;
+use rocket_contrib::Template;
 
 mod paste_id;
 use paste_id::PasteID;
 
 #[get("/")]
-fn index() -> &'static str {
-    "Welcome to Rocket demo pastebin!"
+fn index() -> Template {
+    let context: HashMap<&str, &str> = HashMap::new();
+    Template::render("index", &context)
 }
 
 #[post("/", data = "<paste>")]
