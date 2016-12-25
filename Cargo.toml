@@ -15,3 +15,5 @@ features = ["handlebars_templates"]
 rocket = "0.1.1"
 rocket_codegen = "0.1.1"
 rand = "0.3"
+serde = "0.8"
+serde_derive = "0.8"

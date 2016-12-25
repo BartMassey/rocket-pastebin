@@ -1,2 +1,13 @@
-<html><head><title>Pastebin!</title></head>
-<body><h1>Pastebin!</h1><p>Welcome to the pastebin.</p></body></html>
+<html><head><title>Pastebin!</title></head><body>
+    <h1>Pastebin!</h1>
+    <p>Welcome to the pastebin.</p>
+    <p>Available pastes:<ul>
+        {{#each pastes ~}}
+            <li><tt><a href="/{{paste_id}}">{{paste_id ~}}
+              </a></tt>:&nbsp;{{snippet}}
+            {{~ #if ellipsis ~}}
+              &nbsp;<span style="color:gray">...</span>
+            {{~ /if}}</li>
+        {{~ /each}}
+    </ul></p>
+</body></html>
