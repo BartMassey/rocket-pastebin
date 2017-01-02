@@ -1,3 +1,11 @@
+// Copyright © 2016 Bart Massey
+// [This program is licensed under the "MIT License"]
+// Please see the file COPYING in the source
+// distribution of this software for license terms.
+
+// This code mostly from the Rocket Pastebin demo, used
+// without explicit permission.
+
 use std::fmt;
 use std::borrow::Cow;
 
@@ -7,6 +15,7 @@ use rocket::request::FromParam;
 /// A _probably_ unique paste ID.
 pub struct PasteID<'a>(Cow<'a, str>);
 
+/// Convert value to base-62 character.
 fn base62_char(idx: usize) -> char {
     fn chars_len(start: char, end: char) -> isize {
         (end as u8 - start as u8 + 1) as isize
