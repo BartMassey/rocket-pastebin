@@ -158,3 +158,36 @@ fn main() {
                                            make_edit, accept_edit, delete]);
     rocket.launch()
 }
+
+
+#[cfg(test)]
+mod test {
+    extern crate scraper;
+
+    use super::rocket;
+    use rocket::testing::MockRequest;
+    use rocket::http::{Status, Method};
+    use self::scraper::{Html, Selector};
+
+    #[test]
+    fn index() {
+        let rocket = rocket::ignite().mount("/", routes![super::index]);
+
+        let mut req = MockRequest::new(Method::Get, "/");
+        let mut response = req.dispatch_with(&rocket);
+
+        assert_eq!(response.status(), Status::Ok);
+
+        let body_str = response.body().and_then(|b| b.into_string());
+        assert_has_text(body_str.unwrap_or(String::from("")), String::from("Pastebin!"));
+    }
+
+    fn assert_has_text(body: String, expected: String) {
+      let body_html = Html::parse_fragment(&body.to_string());
+      let selector = Selector::parse("*").unwrap();
+      let elements = body_html.select(&selector);
+      let texts = elements.map(|e| e.text().collect::<Vec<_>>().concat());
+      let actual = texts.fold("".to_string(), (|acc, str| format!("{}:{}", acc, str)));
+      assert!(&actual.contains(&expected));
+    }
+}
