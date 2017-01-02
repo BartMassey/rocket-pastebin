@@ -1,0 +1,12 @@
+<html><head><title>Edit Paste!</title></head><body>
+    <h1>Edit Paste!</h1>
+    <p>Paste: <a href="/{{paste_id}}">{{paste_id}}</a></p>
+    <form action="/edit/{{paste_id}}" method="post">
+      <input type="reset" value="&#8634;"/>
+      <input type="submit" value="&#x2713;"/>
+      <br/>
+      <textarea name="paste" rows="{{paste_rows}}" cols="80">
+        {{~ contents ~}}
+      </textarea>
+    </form> 
+</body></html>

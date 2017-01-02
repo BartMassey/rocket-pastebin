@@ -3,10 +3,11 @@
     <p>Welcome to the pastebin.</p>
     <p>Available pastes:<ul>
         {{#each pastes ~}}
-            <li><tt><a href="/{{paste_id}}">{{paste_id ~}}
-              </a></tt>:&nbsp;{{snippet}}
+        <li><tt>
+            <a href="/{{paste_id}}">{{paste_id ~}}</a></tt>&nbsp;<a href="/edit/{{paste_id}}">&#x270e;</a>:&nbsp;
+            {{~ snippet}}
             {{~ #if ellipsis ~}}
-              &nbsp;<span style="color:gray">...</span>
+            &nbsp;<span style="color:gray">...</span>
             {{~ /if}}</li>
         {{~ /each}}
     </ul></p>
