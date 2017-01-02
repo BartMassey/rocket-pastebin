@@ -10,6 +10,8 @@
 #![feature(proc_macro)]
 #![plugin(rocket_codegen)]
 
+static UPLOAD: &'static str = "upload";
+
 extern crate rocket;
 extern crate rocket_contrib;
 extern crate rand;
@@ -20,7 +22,7 @@ use std::io;
 use std::io::{Read, BufRead, Write};
 use std::path::Path;
 use std::collections::HashMap;
-use std::fs::File;
+use std::fs::{File, create_dir, metadata, Metadata};
 
 use rocket::Data;
 use rocket::response::NamedFile;
@@ -40,12 +42,11 @@ struct PasteInfo {
 
 #[get("/")]
 fn index() -> io::Result<Template> {
-    let dirents = std::fs::read_dir("upload/")
+    let dirents = std::fs::read_dir(UPLOAD)
                   .expect("could not open upload directory");
     let pastes = dirents.map(|d| {
         let paste_id = d.unwrap().file_name().into_string().unwrap();
-        let mut paste_filename = "upload/".to_string();
-        paste_filename.push_str(&paste_id);
+        let paste_filename = Path::new(UPLOAD).join(&paste_id);
         let paste_file = NamedFile::open(&paste_filename)
                          .expect("could not open paste file");
         let mut paste_reader = io::BufReader::new(paste_file);
@@ -69,18 +70,18 @@ fn index() -> io::Result<Template> {
 #[post("/", data = "<paste>")]
 fn upload(paste: Data) -> io::Result<String> {
     let paste_id = PasteID::new(8);
-    let path = Path::new("upload/").join(paste_id.to_string());
+    let path = Path::new(UPLOAD).join(paste_id.to_string());
     paste.stream_to_file(path)?;
     Ok(format!("http://localhost:8000/{}\n", paste_id))
 }
 
 fn open_paste(id: &PasteID) -> io::Result<NamedFile> {
-    let filename = format!("upload/{}", id);
+    let filename = Path::new(UPLOAD).join(id.to_string());
     NamedFile::open(&filename)
 }
 
 fn create_paste(id: &PasteID) -> io::Result<File> {
-    let filename = format!("upload/{}", id);
+    let filename = Path::new(UPLOAD).join(id.to_string());
     File::create(&filename)
 }
 
@@ -121,7 +122,21 @@ fn accept_edit(id: PasteID, form: Form<EditForm>) -> io::Result<Redirect> {
     Ok(Redirect::to("/"))
 }
 
+fn ok_dir<P: AsRef<Path>>(path: P) -> bool {
+    match metadata(path.as_ref()) {
+        Ok(md) => md.is_dir(),
+        _ => false
+    }
+}
+
+fn check_upload_dir() {
+    if !ok_dir(UPLOAD) {
+        create_dir(UPLOAD).expect("could not create upload directory");
+    }
+}
+
 fn main() {
+    check_upload_dir();
     let rocket = rocket::ignite();
     let rocket = rocket.mount("/", routes![index, upload, retrieve,
                                            make_edit, accept_edit]);
