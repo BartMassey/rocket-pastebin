@@ -22,7 +22,7 @@ use std::io;
 use std::io::{Read, BufRead, Write};
 use std::path::Path;
 use std::collections::HashMap;
-use std::fs::{File, create_dir, metadata, Metadata};
+use std::fs::{File, create_dir, metadata};
 
 use rocket::Data;
 use rocket::response::NamedFile;
