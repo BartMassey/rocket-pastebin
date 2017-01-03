@@ -178,8 +178,10 @@ mod test {
 
         assert_eq!(response.status(), Status::Ok);
 
-        let body_str = response.body().and_then(|b| b.into_string());
-        assert_has_text(body_str.unwrap_or(String::from("")), String::from("Pastebin!"));
+        let body_str = response.body().and_then(|b| b.into_string()).unwrap_or(String::from(""));
+        assert_has_text(body_str.clone(), String::from("Pastebin!"));
+        assert_has_selector(body_str.clone(), String::from("ul"));
+        assert_no_selector(body_str.clone(), String::from("ul li"));
     }
 
     fn assert_has_text(body: String, expected: String) {
@@ -189,5 +191,19 @@ mod test {
       let texts = elements.map(|e| e.text().collect::<Vec<_>>().concat());
       let actual = texts.fold("".to_string(), (|acc, str| format!("{}:{}", acc, str)));
       assert!(&actual.contains(&expected));
+    }
+
+    fn assert_has_selector(body: String, selector_text: String) {
+      let body_html = Html::parse_fragment(&body.to_string());
+      let selector = Selector::parse(&selector_text).unwrap();
+      let count = body_html.select(&selector).count();
+      assert!(count > 0);
+    }
+
+    fn assert_no_selector(body: String, selector_text: String) {
+      let body_html = Html::parse_fragment(&body.to_string());
+      let selector = Selector::parse(&selector_text).unwrap();
+      let count = body_html.select(&selector).count();
+      assert_eq!(0, count);
     }
 }
