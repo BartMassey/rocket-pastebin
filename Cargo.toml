@@ -12,13 +12,13 @@ authors = ["Bart Massey <bart@cs.pdx.edu>"]
 name = "pastebin"
 
 [dependencies.rocket_contrib]
-version = "*"
+version = "0.1.3"
 default-features = false
 features = ["handlebars_templates"]
 
 [dependencies]
-rocket = "0.1.1"
-rocket_codegen = "0.1.1"
+rocket = "0.1.3"
+rocket_codegen = "0.1.3"
 rand = "0.3"
 serde = "0.8"
 serde_derive = "0.8"
