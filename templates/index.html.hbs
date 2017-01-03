@@ -11,7 +11,8 @@
     <p>Available pastes:<ul>
         {{#each pastes ~}}
         <li><tt>
-            <a href="/{{paste_id}}">{{paste_id ~}}</a></tt>&nbsp;<a href="/edit/{{paste_id}}">&#x270e;</a>:&nbsp;
+            <a href="/{{paste_id}}">{{paste_id
+            ~}}</a></tt>&nbsp;<a href="/edit/{{paste_id}}">&#x270e;</a><a href="/delete/{{paste_id}}">&#x274c;</a>&nbsp;
             {{~ snippet}}
             {{~ #if ellipsis ~}}
             &nbsp;<span style="color:gray">...</span>

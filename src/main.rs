@@ -23,7 +23,7 @@ use std::io;
 use std::io::{Read, BufRead, Write};
 use std::path::Path;
 use std::collections::HashMap;
-use std::fs::{File, create_dir, metadata};
+use std::fs::{File, create_dir, metadata, remove_file};
 
 use rocket::Data;
 use rocket::response::NamedFile;
@@ -131,6 +131,13 @@ fn accept_edit(id: PasteID, form: Form<EditForm>) -> io::Result<Redirect> {
     Ok(Redirect::to("/"))
 }
 
+#[get("/delete/<id>")]
+fn delete(id: PasteID) -> io::Result<Redirect> {
+    let filename = Path::new(UPLOAD).join(id.to_string());
+    try!(remove_file(&filename));
+    Ok(Redirect::to("/"))
+}
+
 fn ok_dir<P: AsRef<Path>>(path: P) -> bool {
     match metadata(path.as_ref()) {
         Ok(md) => md.is_dir(),
@@ -148,6 +155,6 @@ fn main() {
     check_upload_dir();
     let rocket = rocket::ignite();
     let rocket = rocket.mount("/", routes![index, upload, edit_new, retrieve,
-                                           make_edit, accept_edit]);
+                                           make_edit, accept_edit, delete]);
     rocket.launch()
 }
