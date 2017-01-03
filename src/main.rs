@@ -11,6 +11,7 @@
 #![plugin(rocket_codegen)]
 
 static UPLOAD: &'static str = "upload";
+static NID: usize = 8;
 
 extern crate rocket;
 extern crate rocket_contrib;
@@ -69,10 +70,10 @@ fn index() -> io::Result<Template> {
 
 #[post("/", data = "<paste>")]
 fn upload(paste: Data) -> io::Result<String> {
-    let paste_id = PasteID::new(8);
-    let path = Path::new(UPLOAD).join(paste_id.to_string());
+    let paste_id = PasteID::new(NID);
+    let path = Path::new(UPLOAD).join(&paste_id.to_string());
     paste.stream_to_file(path)?;
-    Ok(format!("http://localhost:8000/{}\n", paste_id))
+    Ok(format!("/{}\n", paste_id))
 }
 
 fn open_paste(id: &PasteID) -> io::Result<NamedFile> {
@@ -88,6 +89,14 @@ fn create_paste(id: &PasteID) -> io::Result<File> {
 #[get("/<id>")]
 fn retrieve(id: PasteID) -> Option<NamedFile> {
     open_paste(&id).ok()
+}
+
+#[get("/new")]
+fn edit_new() -> io::Result<Redirect> {
+    let paste_id = PasteID::new(NID);
+    let f = try!(create_paste(&paste_id));
+    drop(f);
+    Ok(Redirect::to(&format!("/edit/{}", paste_id.to_string())))
 }
 
 #[get("/edit/<id>")]
@@ -138,7 +147,7 @@ fn check_upload_dir() {
 fn main() {
     check_upload_dir();
     let rocket = rocket::ignite();
-    let rocket = rocket.mount("/", routes![index, upload, retrieve,
+    let rocket = rocket.mount("/", routes![index, upload, edit_new, retrieve,
                                            make_edit, accept_edit]);
     rocket.launch()
 }
