@@ -124,9 +124,7 @@ fn accept_edit(id: PasteID, form: Form<EditForm>) -> io::Result<Redirect> {
     let edit = form.get();
     let paste = create_paste(&id)?;
     let mut paste_writer = io::BufWriter::new(paste);
-    let paste_contents =
-        edit.paste.chars().map(|c|{c as u8}).collect::<Vec<u8>>();
-    paste_writer.write_all(paste_contents.as_slice())?;
+    paste_writer.write_all(edit.paste.as_bytes())?;
     paste_writer.flush()?;
     Ok(Redirect::to("/"))
 }
