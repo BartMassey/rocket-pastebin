@@ -176,32 +176,36 @@ mod test {
 
         assert_eq!(response.status(), Status::Ok);
 
-        let body_str = response.body().and_then(|b| b.into_string()).expect("Missing response body!");
-        assert_has_text(&body_str, "Pastebin!");
-        assert_has_selector(&body_str, "ul");
-        assert_no_selector(&body_str, "ul li");
+        let body_str = response.body()
+                       .and_then(|b| b.into_string())
+                       .expect("Missing response body!");
+        let body_html = Html::parse_fragment(&body_str);
+        assert_has_text(&body_html, "Pastebin!");
+        assert_has_selector(&body_html, "ul");
+        assert_no_selector(&body_html, "ul li");
     }
 
-    fn assert_has_text(body: &str, expected: &str) {
-        let body_html = Html::parse_fragment(body);
+    fn assert_has_text(body: &Html, expected: &str) {
         let selector = Selector::parse("*").unwrap();
-        let nodes = body_html.select(&selector);
+        let nodes = body.select(&selector);
         let texts = nodes.map(|node| node.text().collect::<Vec<_>>().concat());
         let actual = texts.collect::<Vec<_>>().concat();
         assert!(&actual.contains(expected));
     }
 
-    fn assert_has_selector(body: &str, selector_text: &str) {
-        let body_html = Html::parse_fragment(body);
-        let selector = Selector::parse(selector_text).expect("Invalid selector!");
-        let count = body_html.select(&selector).count();
+    fn count_selectors(body: &Html, selector_text: &str) -> usize {
+        let selector = Selector::parse(selector_text)
+                       .expect("Invalid selector!");
+        body.select(&selector).count()
+    }
+
+    fn assert_has_selector(body: &Html, selector_text: &str) {
+        let count = count_selectors(body, selector_text);
         assert!(count > 0);
     }
 
-    fn assert_no_selector(body: &str, selector_text: &str) {
-        let body_html = Html::parse_fragment(body);
-        let selector = Selector::parse(selector_text).expect("Invalid selector!");
-        let count = body_html.select(&selector).count();
+    fn assert_no_selector(body: &Html, selector_text: &str) {
+        let count = count_selectors(body, selector_text);
         assert_eq!(0, count);
     }
 }
